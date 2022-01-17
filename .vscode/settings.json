@@ -1,0 +1,13 @@
+{
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "mypy.runUsingActiveInterpreter": true,
+    "editor.rulers": [79],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/__pycache__": true,
+        "**/.pytest_cache": true
+    }
+}
