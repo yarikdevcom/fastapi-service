@@ -1,18 +1,21 @@
-import sqlalchemy as sa
-
 from fastapi import APIRouter, Depends
+from dependency_injector.wiring import inject, Provide
 
-from .db import ENGINE
+from .containers import ChannelContainer
+from .models import Channel, ChannelIn
 
 router = APIRouter()
 
 
-async def get_db():
-    async with ENGINE.connect() as conn:
-        yield conn
+@router.get("/channels", response_model=list[Channel])
+@inject
+async def get_channel_many(query=Depends(Provide(ChannelContainer.query))):
+    return await query.all()
 
 
-@router.get("/")
-async def health(conn=Depends(get_db)):
-    result = (await conn.execute(sa.text("SELECT 1;"))).fetchone()
-    return {"result": str(result)}
+@router.post("/channels", response_model=Channel)
+@inject
+async def create_channel(
+    channel: ChannelIn, query=Depends(Provide(ChannelContainer.query))
+):
+    return await query.create(channel)

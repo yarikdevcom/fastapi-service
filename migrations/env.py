@@ -5,10 +5,11 @@ from sqlalchemy import pool, create_engine
 from alembic import context
 from alembic.script import ScriptDirectory
 
-from app.db import URL, METADATA
+from app.main import create_app  # noqa: import to collect all dependencies
+from app.providers import POSTGRES, METADATA
 
 
-URL = URL.replace("asyncpg", "pg8000")
+URL = str(POSTGRES.url).replace("asyncpg", "pg8000")
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -54,7 +55,7 @@ def run_migrations_offline():
     This configures the context with just a URL
     and not an Engine, though an Engine is acceptable
     here as well.  By skipping the Engine creation
-    we don't even need a DBAPI to be available.
+    we don't even need a POSTGRESAPI to be available.
 
     Calls to context.execute() here emit the given string to the
     script output.

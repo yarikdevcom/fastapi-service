@@ -9,12 +9,15 @@ python = "^3.10"
 fastapi = "^0.72.0"
 asyncpg = "^0.25.0"
 alembic = "^1.7.5"
-aioredis = "^2.0.1"
-aioredis-lock = "^0.1.0"
 uvicorn = "^0.17.0"
 greenlet = "^1.1.2"
 pg8000 = "^1.23.0"
 click = "^8.0.3"
+SQLAlchemy = "^1.4.29"
+dependency-injector = "^4.37.0"
+aioredis = "^2.0.1"
+aioredlock = "^0.7.2"
+hiredis = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
@@ -35,6 +38,8 @@ migrate = "app.bin:migrate"
 upgrade = "app.bin:upgrade"
 server = "app.bin:server"
 test = "app.bin:test"
+remigrate = "app.bin:remigrate"
+worker = "app.bin:worker"
 
 [tool.black]
 line-length = 79

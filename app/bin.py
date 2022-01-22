@@ -1,24 +1,47 @@
 import click
 import time
+import pathlib
 
 from subprocess import call
+
+# TODO: move all calls to docker into some contextmanager
+# or find proper lib to up and down containers
 
 
 @click.command()
 @click.argument("description")
 def migrate(description):
-    call(
-        [
-            "poetry",
-            "run",
-            "alembic",
-            "revision",
-            "--autogenerate",
-            "-m",
-            str(description),
-        ]
-    )
-    call(["poetry", "run", "black", "migrations/"])
+    call(["docker-compose", "up", "-d"])
+    time.sleep(3)
+    try:
+        call(
+            [
+                "poetry",
+                "run",
+                "alembic",
+                "revision",
+                "--autogenerate",
+                "-m",
+                str(description),
+            ]
+        )
+        call(["poetry", "run", "black", "migrations/"])
+    finally:
+        call(["docker-compose", "down"])
+
+
+@click.command()
+@click.pass_context
+def remigrate(ctx):
+    py_files = list(pathlib.Path("migrations/versions").glob("*.py"))
+    if len(py_files) > 1:
+        click.echo(
+            "You can't recreate initial migration because "
+            "you have forward migrations"
+        )
+    for py_file in pathlib.Path("migrations/versions").glob("*.py"):
+        py_file.unlink()
+    ctx.forward(migrate, description="Initial migration")
 
 
 @click.command()
@@ -41,10 +64,12 @@ def server(ctx):
 
 
 @click.command()
-def test():
+@click.pass_context
+def test(ctx):
     call(["docker-compose", "up", "-d"])
     time.sleep(3)
     try:
+        ctx.forward(upgrade)
         call(["poetry", "run", "pytest"])
     finally:
         call(["docker-compose", "down"])
