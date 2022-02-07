@@ -57,7 +57,7 @@ class ModelTableService:
         if offset:
             query = query.offset(offset)
         if order_by:
-            query = query.order_by(*order_by)
+            query = query.order_by(order_by)
         return await self.db.one(query) if first else await self.db.many(query)
 
     async def create(self, model, exclude: tuple = ("id",)):
