@@ -11,3 +11,4 @@ cov.xml
 /dist/
 .vagrant
 /node_modules/
+/celery.db

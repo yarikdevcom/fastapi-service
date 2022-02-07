@@ -18,6 +18,7 @@ dependency-injector = "^4.37.0"
 aioredis = "^2.0.1"
 aioredlock = "^0.7.2"
 hiredis = "^2.0.0"
+celery = {extras = ["redis", "msgpack"], version = "^5.2.3"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"

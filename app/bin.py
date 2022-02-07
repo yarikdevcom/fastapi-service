@@ -73,3 +73,20 @@ def test(ctx):
         call(["poetry", "run", "pytest"])
     finally:
         call(["docker-compose", "down"])
+
+
+@click.command()
+def worker():
+    call(
+        [
+            "poetry",
+            "run",
+            "celery",
+            "-A",
+            "app.tasks",
+            "worker",
+            "--loglevel=INFO",
+            "--concurrency=2",
+            "--statedb=celery",
+        ]
+    )
