@@ -1,19 +1,13 @@
 import typing as T
 
-from datetime import datetime
-
 from pydantic import BaseModel
 
 
-class ChannelIn(BaseModel):
+class ContentIn(BaseModel):
     url: str
 
 
-class Channel(ChannelIn):
+class Content(ContentIn):
     id: int
     url: str
-    start_listen_at: T.Optional[datetime]
-    ping_listen_at: T.Optional[datetime]
-    stop_listen_at: T.Optional[datetime]
-    ignore: bool = False
-    active: bool = False
+    body: T.Optional[str]

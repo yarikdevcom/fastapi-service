@@ -1,30 +1,28 @@
 from fastapi import APIRouter, Depends
 from dependency_injector.wiring import inject, Provide
 
-from .containers import ChannelContainer
-from .models import Channel, ChannelIn
-from .tasks import get_web_page
+from .containers import ContentContainer
+from .models import Content, ContentIn
+from .tasks import fetch_content
 
 router = APIRouter()
 
 
-@router.get("/channels", response_model=list[Channel])
+@router.get("/contents", response_model=list[Content])
 @inject
-async def get_channel_many(query=Depends(Provide(ChannelContainer.query))):
-    for i in range(60):
-        get_web_page.delay("https://www.google.com/")
+async def get_content_many(
+    query=Depends(Provide(ContentContainer.query)),
+):
     return await query.all()
 
 
-@router.post("/channels", response_model=Channel)
+@router.post("/contents", response_model=Content)
 @inject
-async def create_channel(
-    channel: ChannelIn, query=Depends(Provide(ChannelContainer.query))
+async def create_content(
+    content_in: ContentIn,
+    query=Depends(Provide(ContentContainer.query)),
 ):
-    return await query.create(channel)
-
-
-@router.get("/getgoogle")
-async def get_google_in_bg():
-    for _ in range(60):
-        get_web_page.delay("https://www.google.com")
+    content: Content = await query.create(content_in)
+    await query.db.connection.commit()
+    fetch_content.delay(content.id)
+    return content

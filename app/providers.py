@@ -1,17 +1,17 @@
+import asyncio
+
 import aioredis
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import create_async_engine
-from aioredlock import Aioredlock
 from celery import Celery
 
 POSTGRES = create_async_engine(
-    "postgresql+asyncpg://ps:ps@localhost:5432/ps", echo=True
+    "postgresql+asyncpg://ps:ps@localhost:5432/ps", future=True, echo=True
 )
 METADATA = sa.MetaData()
 
 REDIS = aioredis.from_url("redis://localhost/1")
-REDLOCK = Aioredlock("redis://localhost/1")
 
 CELERY = Celery(
     "tasks", backend="redis://localhost/2", broker="redis://localhost/2"
@@ -29,16 +29,16 @@ CELERY.conf.update(
     result_serializer="msgpack",
     enable_utc=True,
 )
+CELERY.loop = asyncio.new_event_loop()
 
 
 async def get_db_connnection():
     """Get database connection with auto-commit."""
-    connection = await POSTGRES.begin()
-
-    try:
-        yield connection
-    except Exception:
-        await connection.rollback()
-        raise
-    finally:
-        await connection.close()
+    async with POSTGRES.connect() as connection:
+        try:
+            await connection.begin()
+            yield connection
+            await connection.commit()
+        except:  # noqa
+            await connection.rollback()
+            raise

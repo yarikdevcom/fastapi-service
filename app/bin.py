@@ -58,7 +58,7 @@ def server(ctx):
     time.sleep(3)
     try:
         ctx.forward(upgrade)
-        call(["poetry", "run", "uvicorn", "app.main:app", "--reload"])
+        call(["poetry", "run", "uvicorn", "app:APP", "--reload"])
     finally:
         call(["docker-compose", "down"])
 
@@ -86,7 +86,7 @@ def worker():
             "app.tasks",
             "worker",
             "--loglevel=INFO",
-            "--concurrency=2",
+            "--pool=solo",
             "--statedb=celery",
         ]
     )

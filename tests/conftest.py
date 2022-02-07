@@ -2,8 +2,7 @@ import pytest_asyncio
 
 from httpx import AsyncClient
 
-from app.main import app
-from app.providers import POSTGRES
+from app import APP
 
 import pytest
 import asyncio
@@ -11,14 +10,8 @@ import asyncio
 
 @pytest_asyncio.fixture
 async def client():
-    async with AsyncClient(app=app, base_url="http://test.com") as cl:
+    async with AsyncClient(app=APP, base_url="http://test.com") as cl:
         yield cl
-
-
-@pytest_asyncio.fixture
-async def db():
-    async with POSTGRES.connect() as conn:
-        yield conn
 
 
 @pytest.fixture(scope="session")

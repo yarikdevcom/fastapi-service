@@ -14,24 +14,6 @@ typing-extensions = "*"
 hiredis = ["hiredis (>=1.0)"]
 
 [[package]]
-name = "aioredlock"
-version = "0.7.2"
-description = "Asyncio implemetation of Redis distributed locks"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-aioredis = "*"
-attrs = ">=17.4.0"
-
-[package.extras]
-cicd = ["codecov"]
-examples = ["aiodocker"]
-package = ["bump2version", "twine", "wheel"]
-test = ["pytest (==6.1.0)", "pytest-asyncio", "pytest-mock", "pytest-cov", "flake8"]
-
-[[package]]
 name = "alembic"
 version = "1.7.6"
 description = "A database migration tool for SQLAlchemy."
@@ -126,7 +108,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 name = "attrs"
 version = "21.4.0"
 description = "Classes Without Boilerplate"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
@@ -963,16 +945,12 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "20b75e39e39f53cd17a9ffd442b04a8a0bf1ec8c3e45ebd7f49864db629b0b4f"
+content-hash = "fadc31b0b615f5542b3fcea3540b30082030957ec2b2ecab7898d1b7469b3971"
 
 [metadata.files]
 aioredis = [
     {file = "aioredis-2.0.1-py3-none-any.whl", hash = "sha256:9ac0d0b3b485d293b8ca1987e6de8658d7dafcca1cddfcd1d506cae8cdebfdd6"},
     {file = "aioredis-2.0.1.tar.gz", hash = "sha256:eaa51aaf993f2d71f54b70527c440437ba65340588afeb786cd87c55c89cd98e"},
-]
-aioredlock = [
-    {file = "aioredlock-0.7.2-py3-none-any.whl", hash = "sha256:573236b5c1c398e644c0ce9b3565a5303651249ff152f0daacdd7847cd1d124b"},
-    {file = "aioredlock-0.7.2.tar.gz", hash = "sha256:9826135c39a4e31a983b201f113ce2ab985829001b76282d897a3ccca701bf05"},
 ]
 alembic = [
     {file = "alembic-1.7.6-py3-none-any.whl", hash = "sha256:ad842f2c3ab5c5d4861232730779c05e33db4ba880a08b85eb505e87c01095bc"},

@@ -5,7 +5,7 @@ from sqlalchemy import pool, create_engine
 from alembic import context
 from alembic.script import ScriptDirectory
 
-from app.main import create_app  # noqa: import to collect all dependencies
+from app import APP  # noqa: import to collect all dependencies
 from app.providers import POSTGRES, METADATA
 
 
