@@ -2,10 +2,7 @@ import pytest_asyncio
 
 from httpx import AsyncClient
 
-from app import APP
-
-import pytest
-import asyncio
+from app import APP, APP_CONTAINER
 
 
 @pytest_asyncio.fixture
@@ -14,11 +11,8 @@ async def client():
         yield cl
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    # NOTE: https://github.com/pytest-dev/
-    # pytest-asyncio/issues/207#issuecomment-943474080
-    # absolute sh*t for pytest_asyncio loops
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
+@pytest_asyncio.fixture
+async def container():
+    await APP_CONTAINER.init_resources()
+    yield APP_CONTAINER
+    await APP_CONTAINER.shutdown_resources()

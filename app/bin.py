@@ -10,9 +10,9 @@ from subprocess import call
 
 @click.command()
 @click.argument("description")
-def migrate(description):
+def makemigration(description):
     call(["docker-compose", "up", "-d"])
-    time.sleep(3)
+    time.sleep(2)
     try:
         call(
             [
@@ -25,14 +25,14 @@ def migrate(description):
                 str(description),
             ]
         )
-        call(["poetry", "run", "black", "migrations/"])
+        call(["poetry", "run", "pre-commit", "run", "-a"])
     finally:
         call(["docker-compose", "down"])
 
 
 @click.command()
 @click.pass_context
-def remigrate(ctx):
+def recreatemigrations(ctx):
     py_files = list(pathlib.Path("migrations/versions").glob("*.py"))
     if len(py_files) > 1:
         click.echo(
@@ -41,12 +41,12 @@ def remigrate(ctx):
         )
     for py_file in pathlib.Path("migrations/versions").glob("*.py"):
         py_file.unlink()
-    ctx.forward(migrate, description="Initial migration")
+    ctx.forward(makemigration, description="Initial migration")
 
 
 @click.command()
 @click.argument("revision", required=False)
-def upgrade(revision):
+def migrate(revision):
     revision = revision or "heads"
     call(["poetry", "run", "alembic", "upgrade", str(revision)])
 
@@ -55,9 +55,9 @@ def upgrade(revision):
 @click.pass_context
 def server(ctx):
     call(["docker-compose", "up", "-d"])
-    time.sleep(3)
+    time.sleep(2)
     try:
-        ctx.forward(upgrade)
+        ctx.forward(migrate)
         call(["poetry", "run", "uvicorn", "app:APP", "--reload"])
     finally:
         call(["docker-compose", "down"])
@@ -67,10 +67,10 @@ def server(ctx):
 @click.pass_context
 def test(ctx):
     call(["docker-compose", "up", "-d"])
-    time.sleep(3)
+    time.sleep(2)
     try:
-        ctx.forward(upgrade)
-        call(["poetry", "run", "pytest"])
+        ctx.forward(migrate)
+        call(["poetry", "run", "pytest", "-s"])
     finally:
         call(["docker-compose", "down"])
 
@@ -83,10 +83,10 @@ def worker():
             "run",
             "celery",
             "-A",
-            "app.tasks",
+            "app",
             "worker",
             "--loglevel=INFO",
             "--pool=solo",
-            "--statedb=celery",
+            "--statedb=celery.db",
         ]
     )

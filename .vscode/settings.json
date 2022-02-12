@@ -1,13 +1,21 @@
 {
     "python.linting.enabled": true,
+    "python.defaultInterpreterPath": "/Users/morty/Library/Caches/pypoetry/virtualenvs/app-U45XP36z-py3.10/bin/python",
     "python.linting.flake8Enabled": true,
+    "python.analysis.autoImportCompletions": false,
     "mypy.runUsingActiveInterpreter": true,
     "editor.rulers": [79],
+    "editor.wordWrap": "bounded",
     "files.exclude": {
         "**/.git": true,
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
         "**/__pycache__": true,
         "**/.pytest_cache": true
-    }
+    },
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }

@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises:
-Create Date: 2022-02-07 23:21:03.039573
+Create Date: 2022-02-13 00:59:50.983274
 
 """
 from alembic import op
@@ -24,6 +24,7 @@ def upgrade():
         sa.Column("url", sa.String(length=1024), nullable=False),
         sa.Column("body", sa.Text(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("url"),
     )
     # ### end Alembic commands ###
 

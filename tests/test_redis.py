@@ -1,9 +1,8 @@
 import pytest
 
-from app.providers import REDIS
-
 
 @pytest.mark.asyncio
-async def test_simple_redis():
-    await REDIS.set("123", 100_000)
-    assert int(await REDIS.get("123")) == 100_000
+async def test_simple_redis(container):
+    redis = container.redis()
+    await redis.set("123", 100_000)
+    assert int(await redis.get("123")) == 100_000

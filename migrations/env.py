@@ -5,11 +5,10 @@ from sqlalchemy import pool, create_engine
 from alembic import context
 from alembic.script import ScriptDirectory
 
-from app import APP  # noqa: import to collect all dependencies
-from app.providers import POSTGRES, METADATA
+from app import APP_CONTAINER  # noqa: import to collect all dependencies
+from app.tables import METADATA
 
-
-URL = str(POSTGRES.url).replace("asyncpg", "pg8000")
+URL = str(APP_CONTAINER.config.db.url()).replace("asyncpg", "pg8000")
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

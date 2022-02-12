@@ -1,20 +1,30 @@
-import asyncio
-
 import pytest
+import asyncio
 
 
 @pytest.mark.asyncio
-async def test_content_created(client):
-    url = "https://www.google.com/"
-    response = await client.post("/contents", json={"url": url})
-    assert response.status_code == 200
+async def test_content_created(client, container):
+    COUNT = 800
+    URLS = [f"https://www.google.com/{i}" for i in range(COUNT)]
+    responses = await asyncio.gather(
+        *[client.post("/contents", json={"url": url}) for url in URLS]
+    )
+    for resp in responses:
+        assert resp.status_code == 200
+
+    url = URLS[0]
+    response = responses[0]
     data = response.json()
     assert data["url"] == url
 
-    await asyncio.sleep(2)
+    responses = await asyncio.gather(
+        *[client.post("/contents", json={"url": url}) for url in URLS]
+    )
+
+    query = await container.content.query()
+    assert len(URLS) == len(list(await query.all()))
 
     response = await client.get("/contents")
+
     assert response.status_code == 200
-    data = response.json()
-    print(data)
-    assert data
+    assert len(response.json()) == len(URLS)
