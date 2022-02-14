@@ -10,8 +10,8 @@ from .resources import (
     get_celery,
     get_redis,
 )
-from .models import Content
-from .tables import CONTENT_TABLE
+from .models import Content, Bot
+from .tables import CONTENT_TABLE, BOT_TABLE
 from .services import ModelCursorService, ModelQueryService
 
 
@@ -58,4 +58,7 @@ class AppContainer(containers.DeclarativeContainer):
     redis = providers.Resource(get_redis, url=config.redis.url)
     content = providers.Container(
         ModelQueryContainer, db=db, model=Content, table=CONTENT_TABLE
+    )
+    bot = providers.Container(
+        ModelQueryContainer, db=db, model=Bot, table=BOT_TABLE
     )

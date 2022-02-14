@@ -67,7 +67,7 @@ class ModelQueryService:
             query = query.limit(limit)
         if offset:
             query = query.offset(offset)
-        if order_by:
+        if order_by is not None:
             query = query.order_by(order_by)
         return (
             await self.cursor.one(query)
@@ -84,12 +84,15 @@ class ModelQueryService:
 
     async def update(self, model, exclude: tuple = ("id",), query=None):
         query = query or (self.table.c.id == model.id)
-        return await self.cursor.one(
+        res = await self.cursor.one(
             self.table.update(query)
             .values(model.dict(exclude=set(exclude)))
             .returning(self.table)
         )
+        await self.commit()
+        return res
 
     async def delete(self, id_: int = None, query=None):
         query = query or (self.table.c.id == id_)
-        await self.cursor.one(self.table.delete(query))
+        await self.cursor.execute(self.table.delete(query))
+        await self.commit()
