@@ -84,15 +84,14 @@ class ModelQueryService:
 
     async def update(self, model, exclude: tuple = ("id",), query=None):
         query = query or (self.table.c.id == model.id)
-        res = await self.cursor.one(
+        return await self.cursor.one(
             self.table.update(query)
             .values(model.dict(exclude=set(exclude)))
             .returning(self.table)
         )
-        await self.commit()
-        return res
 
     async def delete(self, id_: int = None, query=None):
-        query = query or (self.table.c.id == id_)
-        await self.cursor.execute(self.table.delete(query))
-        await self.commit()
+        query = query or sa.delete(self.table)\
+                .where(self.table.c.id == id_)\
+                .returning(self.table)
+        return (await self.cursor.execute(query)).fetchone()
