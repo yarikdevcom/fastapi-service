@@ -6,9 +6,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=ps
-      - POSTGRES_POSTGRES=ps
-      - POSTGRES_PASSWORD=ps
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=app
+      - POSTGRES_DB=app
   redis:
     image: 'redis:6.2.6'
     ports:

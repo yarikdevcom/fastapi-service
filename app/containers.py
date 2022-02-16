@@ -44,11 +44,11 @@ class AppContainer(containers.DeclarativeContainer):
     config = providers.Configuration(
         default={
             "db": {
-                "url": "postgresql+asyncpg://ps:ps@localhost:5432/ps",
+                "url": "postgresql+asyncpg://app:app@localhost:5432/app",
                 "echo": False,
-                "pool_size": 60,
-                "max_overflow": 0,
-                "pool_timeout": 30,
+                "pool_size": 30,
+                "max_overflow": 10,
+                "pool_timeout": 10,
             },
             "redis": {"url": "redis://localhost/1"},
         }

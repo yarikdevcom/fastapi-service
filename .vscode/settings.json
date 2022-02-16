@@ -1,6 +1,6 @@
 {
     "python.linting.enabled": true,
-    "python.defaultInterpreterPath": "/Users/morty/Library/Caches/pypoetry/virtualenvs/app-U45XP36z-py3.10/bin/python",
+    "python.defaultInterpreterPath": "./.venv/bin/python",
     "python.linting.flake8Enabled": true,
     "python.analysis.autoImportCompletions": false,
     "mypy.runUsingActiveInterpreter": true,
