@@ -1,29 +1,30 @@
 from fastapi import APIRouter, Depends
 from dependency_injector.wiring import inject, Provide
 
-from app.services import ModelQueryService
+from ..services import ModelDataService
+from ..containers import AppContainer
 
-from .containers import AppContainer
 from .models import Content, ContentIn
-
 from .tasks import fetch_content
 
-router = APIRouter()
+ROUTER = APIRouter()
 
 
-@router.get("/contents", response_model=list[Content])
+@ROUTER.get("/contents", response_model=list[Content])
 @inject
 async def get_content_many(
-    query=Depends(Provide[AppContainer.content.query]),
+    query=Depends(Provide[AppContainer.content.data.query]),
 ):
     return await query.all()
 
 
-@router.post("/contents", response_model=Content)
+@ROUTER.post("/contents", response_model=Content)
 @inject
 async def create_content(
     content_in: ContentIn,
-    query: ModelQueryService = Depends(Provide[AppContainer.content.query]),
+    query: ModelDataService = Depends(
+        Provide[AppContainer.content.data.query]
+    ),
 ):
     # -> move this to manager. APP components -> implement
     # -> wire into app

@@ -7,8 +7,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import ORJSONResponse
 from celery.signals import task_prerun, task_postrun
 
-from . import api, tasks
 from .containers import AppContainer
+
+from .content import api as api_content
 
 __version__ = "0.1.0"
 
@@ -16,11 +17,12 @@ __version__ = "0.1.0"
 APP = FastAPI(default_response_class=ORJSONResponse)
 
 # routes
-APP.include_router(api.router)
+APP.include_router(api_content.ROUTER)
 
 # containers
 APP_CONTAINER = AppContainer()
-APP_CONTAINER.wire(modules=(api, tasks))
+APP_CONTAINER.wire(packages=(".content",))
+APP_CONTAINER.check_dependencies()
 
 # celery app discovery
 CELERY = APP_CONTAINER.celery()

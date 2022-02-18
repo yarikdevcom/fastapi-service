@@ -3,8 +3,12 @@ import asyncio
 import aioredis
 import sqlalchemy as sa
 
-from sqlalchemy.ext.asyncio import create_async_engine
+from dependency_injector import containers, providers
+from collections import deque
 from celery import Celery
+from sqlalchemy.ext.asyncio import create_async_engine
+
+from .services import ModelCursorService, ModelDataService
 
 
 def get_redis(url: str):
@@ -73,3 +77,27 @@ async def get_db_engine(
         await cleanup_db_connections(connections)
 
     await engine.dispose()
+
+
+class DBContainer(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    connections = providers.Singleton(deque)
+    engine = providers.Resource(
+        get_db_engine,
+        url=config.url,
+        echo=config.echo,
+        pool_size=config.pool_size,
+        max_overflow=config.max_overflow,
+        pool_timeout=config.pool_timeout,
+        connections=connections,
+    )
+    cleanup = providers.Coroutine(cleanup_db_connections, connections)
+    connection = providers.Coroutine(get_db_connection, engine, connections)
+
+
+class ModelDataContainer(containers.DeclarativeContainer):
+    db = providers.DependenciesContainer()
+    model = providers.Dependency()
+    table = providers.Dependency()
+    cursor = providers.Factory(ModelCursorService, db.connection, model)
+    query = providers.Factory(ModelDataService, cursor, table)

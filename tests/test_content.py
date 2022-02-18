@@ -1,8 +1,6 @@
 import pytest
 import asyncio
 
-from collections import Counter
-
 
 @pytest.mark.asyncio
 async def test_content_created(client, container):
@@ -23,7 +21,7 @@ async def test_content_created(client, container):
         *[client.post("/contents", json={"url": url}) for url in URLS]
     )
 
-    query = await container.content.query()
+    query = await container.content.data.query()
     assert len(URLS) == len(list(await query.all()))
 
     response = await client.get("/contents")

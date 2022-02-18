@@ -6,8 +6,8 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from dependency_injector.wiring import Provide, inject
 
-from .containers import AppContainer
-from .services import ModelQueryService
+from ..services import ModelDataService
+from ..containers import AppContainer
 
 logger = get_task_logger(__name__)
 
@@ -15,7 +15,7 @@ logger = get_task_logger(__name__)
 @inject
 async def fetch_content_async(
     content_id,
-    query: ModelQueryService = Provide[AppContainer.content.query],
+    query: ModelDataService = Provide[AppContainer.content.data.query],
 ):
     content = await query.get(content_id)
     content.body = httpx.get(content.url).text

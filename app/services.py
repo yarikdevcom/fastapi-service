@@ -28,7 +28,7 @@ class ModelCursorService:
         return (self.model.validate(item) for item in result)
 
 
-class ModelQueryService:
+class ModelDataService:
     """Using model and linked table, provides general fetching methods:
     all, get, create, update, delete. Always accepting and returning model
     objects.
