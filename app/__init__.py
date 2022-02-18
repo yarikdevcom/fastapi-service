@@ -9,23 +9,21 @@ from celery.signals import task_prerun, task_postrun
 
 from .containers import AppContainer
 
-from .content import api as api_content
-
 __version__ = "0.1.0"
 
 
 APP = FastAPI(default_response_class=ORJSONResponse)
 
-# routes
-APP.include_router(api_content.ROUTER)
-
 # containers
 APP_CONTAINER = AppContainer()
-APP_CONTAINER.wire(packages=(".content",))
+APP_CONTAINER.wire(packages=(".features.content",))
 APP_CONTAINER.check_dependencies()
 
+# routes
+APP.include_router(APP_CONTAINER.features.content.api())
+
 # celery app discovery
-CELERY = APP_CONTAINER.celery()
+CELERY = APP_CONTAINER.resources.celery()
 
 
 # events
@@ -43,7 +41,7 @@ async def on_shutdown():
 @APP.middleware("http")
 async def cleanup_app_db_connections(request, call_next):
     response = await call_next(request)
-    await APP_CONTAINER.db.cleanup()
+    await APP_CONTAINER.resources.db.cleanup()
     return response
 
 

@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 
-from ..tables import METADATA
+from ...resources.providers import METADATA
 
 CONTENT_TABLE = sa.Table(
     "content",
