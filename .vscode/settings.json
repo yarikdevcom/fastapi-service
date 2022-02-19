@@ -5,13 +5,15 @@
     "python.analysis.autoImportCompletions": false,
     "mypy.runUsingActiveInterpreter": true,
     "editor.rulers": [79],
-    "editor.wordWrap": "bounded",
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 79,
     "files.exclude": {
         "**/.git": true,
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
         "**/__pycache__": true,
-        "**/.pytest_cache": true
+        "**/.pytest_cache": true,
+        "**/.venv": true,
     },
     "python.testing.pytestArgs": [
         "tests"
