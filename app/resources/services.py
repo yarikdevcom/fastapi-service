@@ -67,7 +67,7 @@ class ModelDataService:
             query = query.limit(limit)
         if offset:
             query = query.offset(offset)
-        if order_by:
+        if order_by is None:
             query = query.order_by(order_by)
         return (
             await self.cursor.one(query)
