@@ -23,7 +23,14 @@ jobs:
         run: pip install poetry
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
-      - name: Install package
+      - name: Cache dependencies
+        id: poetry
+        uses: actions/cache@v2
+        with:
+          path: ~/.venv
+          key: poetry
+      - name: Install dependencies
+        if: steps.poetry.outputs.cache-hit != 'true'
         run: poetry install
       - name: Run tests
         run: poetry run test
