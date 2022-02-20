@@ -15,23 +15,35 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
+
       - name: Set Up Python 3.10.2
         uses: actions/setup-python@v2
         with:
           python-version: 3.10.2
+
+      - name: Download cache for pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: poetry-1.1.13
+          restore-keys: poetry
+
       - name: Install poetry
-        run: pip install poetry
-      - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
-      - name: Cache dependencies
+        if: steps.poetry.outputs.cache-hit != 'true'
+        run: 
+          pip install poetry==1.1.13
+
+      - name: Download cache for poetry
         id: poetry-deps
         uses: actions/cache@v2
         with:
           path: ./.venv/
           key: poetry-deps-${{ hashFiles('poetry.lock') }}
           restore-keys: poetry-deps
+
       - name: Install dependencies
         if: steps.poetry-deps.outputs.cache-hit != 'true'
         run: poetry install
+
       - name: Run tests
         run: poetry run test
