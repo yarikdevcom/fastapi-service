@@ -23,14 +23,12 @@ jobs:
 
       - name: Download cache for pip
         uses: actions/cache@v2
-        id: pip
         with:
           path: ~/.cache/pip
           key: poetry-1.1.13
           restore-keys: poetry
 
       - name: Install poetry
-        if: steps.pip.outputs.cache-hit != 'true'
         run: 
           pip install poetry==1.1.13
 
