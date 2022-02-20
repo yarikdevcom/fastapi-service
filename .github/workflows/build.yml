@@ -24,13 +24,14 @@ jobs:
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
       - name: Cache dependencies
-        id: poetry
+        id: poetry-deps
         uses: actions/cache@v2
         with:
-          path: ~/.venv
-          key: poetry
+          path: ./.venv/
+          key: poetry-deps-${{ hashFiles('poetry.lock') }}
+          restore-keys: poetry-deps
       - name: Install dependencies
-        if: steps.poetry.outputs.cache-hit != 'true'
+        if: steps.poetry-deps.outputs.cache-hit != 'true'
         run: poetry install
       - name: Run tests
         run: poetry run test
