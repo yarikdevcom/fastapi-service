@@ -3,8 +3,9 @@ import asyncio
 import asyncpg
 import sqlalchemy as sa
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, APIRouter
 from fastapi.responses import ORJSONResponse
+from dependency_injector import providers
 from celery.signals import task_prerun, task_postrun
 
 from .containers import AppContainer
@@ -16,11 +17,14 @@ APP = FastAPI(default_response_class=ORJSONResponse)
 
 # containers
 APP_CONTAINER = AppContainer()
-APP_CONTAINER.wire(packages=(".features.content",))
+APP_CONTAINER.config.from_yaml('./configs/test.yml')
 APP_CONTAINER.check_dependencies()
 
 # routes
-APP.include_router(APP_CONTAINER.features.content.api())
+for obj in APP_CONTAINER.traverse(types=(providers.Object,)):
+    api = obj()
+    if isinstance(api, APIRouter):
+        APP.include_router(api)
 
 # celery app discovery
 CELERY = APP_CONTAINER.resources.celery()
@@ -35,6 +39,7 @@ async def on_startup():
 @APP.on_event("shutdown")
 async def on_shutdown():
     await APP_CONTAINER.shutdown_resources()
+    APP_CONTAINER.unwire()
 
 
 # middlewares

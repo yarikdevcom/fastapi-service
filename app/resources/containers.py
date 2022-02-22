@@ -19,9 +19,9 @@ class DBContainer(containers.DeclarativeContainer):
         get_db_engine,
         url=config.url,
         echo=config.echo,
-        pool_size=config.pool_size,
-        max_overflow=config.max_overflow,
-        pool_timeout=config.pool_timeout,
+        pool_size=config.pool_size.as_int(),
+        max_overflow=config.max_overflow.as_int(),
+        pool_timeout=config.pool_timeout.as_int(),
         connections=connections,
     )
     cleanup = providers.Coroutine(cleanup_db_connection, connections)

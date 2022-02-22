@@ -19,6 +19,7 @@ aioredis = "^2.0.1"
 hiredis = "^2.0.0"
 celery = {extras = ["redis", "msgpack"], version = "^5.2.3"}
 orjson = "^3.6.6"
+PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"

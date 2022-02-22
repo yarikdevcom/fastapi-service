@@ -5,21 +5,10 @@ from .features import FeaturesContainer
 
 
 class AppContainer(containers.DeclarativeContainer):
-    config = providers.Configuration(
-        default={
-            "resources": {
-                "db": {
-                    "url": "postgresql+asyncpg://app:app@localhost:5432/app",
-                    "echo": False,
-                    "pool_size": 30,
-                    "max_overflow": 10,
-                    "pool_timeout": 10,
-                },
-                "redis": {"url": "redis://localhost/1"},
-            }
-        }
+    wiring_config = containers.WiringConfiguration(
+        packages=(".features.content",)
     )
-
+    config = providers.Configuration()
     resources = providers.Container(
         ResourcesContainer, config=config.resources
     )
