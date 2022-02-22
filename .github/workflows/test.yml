@@ -46,9 +46,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.poetry-install.outputs.cache-hit != 'true'
-        run:
-          rm -rf ./.venv/
-          poetry install
+        run: rm -rf ./.venv/ && poetry install
 
       - name: Run tests
         run: poetry run test
