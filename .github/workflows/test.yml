@@ -29,8 +29,8 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
-          key: poetry-1.1.13
-          restore-keys: poetry
+          key: poetry-pip-1.1.13
+          restore-keys: poetry-pip
 
       - name: Install poetry
         run: 
@@ -41,12 +41,14 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ./.venv/
-          key: poetry-deps-${{ hashFiles('poetry.lock') }}
-          restore-keys: poetry-deps
+          key: poetry-install-${{ hashFiles('poetry.lock') }}
+          restore-keys: poetry-install
 
       - name: Install dependencies
-        if: steps.poetry-deps.outputs.cache-hit != 'true'
-        run: poetry install
+        if: steps.poetry-install.outputs.cache-hit != 'true'
+        run:
+          rm -rf ./.venv/
+          poetry install
 
       - name: Run tests
         run: poetry run test
