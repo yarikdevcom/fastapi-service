@@ -37,7 +37,7 @@ jobs:
           pip install poetry==1.1.13
 
       - name: Download cache for poetry
-        id: poetry-deps
+        id: poetry-install
         uses: actions/cache@v2
         with:
           path: ./.venv/
