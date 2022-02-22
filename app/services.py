@@ -94,4 +94,4 @@ class ModelQueryService:
         query = query or sa.delete(self.table)\
                 .where(self.table.c.id == id_)\
                 .returning(self.table)
-        return (await self.cursor.execute(query)).fetchone()
+        return await self.cursor.one(query)
