@@ -67,7 +67,7 @@ class ModelDataService:
             query = query.limit(limit)
         if offset:
             query = query.offset(offset)
-        if order_by is None:
+        if order_by is not None:
             query = query.order_by(order_by)
         return (
             await self.cursor.one(query)
@@ -91,5 +91,7 @@ class ModelDataService:
         )
 
     async def delete(self, id_: int = None, query=None):
-        query = query or (self.table.c.id == id_)
-        await self.cursor.one(self.table.delete(query))
+        query = query or sa.delete(self.table)\
+                .where(self.table.c.id == id_)\
+                .returning(self.table)
+        return await self.cursor.one(query)

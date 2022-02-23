@@ -6,7 +6,7 @@ from .features import FeaturesContainer
 
 class AppContainer(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
-        packages=(".features.content",)
+        packages=(".features.content", ".features.twitch")
     )
     config = providers.Configuration()
     resources = providers.Container(
