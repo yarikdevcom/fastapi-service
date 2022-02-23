@@ -16,12 +16,12 @@ async def test_create_delete(client, container):
                         "client_id": "client123", "nickname": "Cooper123"})
     assert create_one.status_code == 200
 
-    query = await container.features.bot.data.query()
+    query = await container.features.twitch.bot.query()
     id = create_one.json()["id"]
     await query.delete(id_=id)
     await query.commit()
 
-    query = await container.features.bot.data.query()
+    query = await container.features.twitch.bot.query()
     deleted_bot = await query.get(id)
     assert deleted_bot is None
 
@@ -30,7 +30,7 @@ async def test_create_delete(client, container):
                                     "client123", "nickname": "to_filter"})
         for _ in range(10)]
     )
-    query = await container.features.bot.data.query()
+    query = await container.features.twitch.bot.query()
     for item in create_many:
         assert item.status_code == 200
         item_json = item.json()
@@ -51,7 +51,7 @@ async def test_filter(client, container):
         for _ in range(10)]
     )
 
-    query = await container.features.bot.data.query()
+    query = await container.features.twitch.bot.query()
     filtered_bots = await query.filter(
         query.table.c.nickname == "to_filter"
     )
@@ -70,7 +70,7 @@ async def test_update(client, container):
                                     "client123", "nickname": "to_filter"})
         for _ in range(10)]
     )
-    query = await container.features.bot.data.query()
+    query = await container.features.twitch.bot.query()
     bots = list(await query.filter(
         query.table.c.nickname == "to_filter"
     ))
@@ -90,7 +90,7 @@ async def test_update(client, container):
         await query.update(updated_bot)
     await query.commit()
 
-    query = await container.features.bot.data.query()
+    query = await container.features.twitch.bot.query()
     filtered_bots = await query.filter(
         query=sa.and_(
             query.table.c.nickname == "to_filter",
@@ -104,7 +104,7 @@ async def test_update(client, container):
         await query.delete(id_=id)
     await query.commit()
 
-    query = await container.features.bot.data.query()
+    query = await container.features.twitch.bot.query()
     check_for_delete = await query.filter(
         query=sa.and_(
             query.table.c.nickname == "to_filter",
@@ -116,16 +116,16 @@ async def test_update(client, container):
 
 @pytest.mark.asyncio
 async def test_rollback(client, container):
-    query = await container.features.bot.data.query()
-    
+    query = await container.features.twitch.bot.query()
+
     bot_1 = BotIn(
-        secret_id ='test_raise1',
+        secret_id='test_raise1',
         client_id='test',
         nickname='testn',
         load=4
     )
     bot_2 = BotIn(
-        secret_id ='test_raise2',
+        secret_id='test_raise2',
         client_id='test',
         nickname='testn',
         load=4
@@ -139,7 +139,7 @@ async def test_rollback(client, container):
     await client.get('/raise404')
     await query.commit()
 
-    query = await container.features.bot.data.query()
+    query = await container.features.twitch.bot.query()
     check_bot_1 = await query.filter(
         query=(query.table.c.secret_id == "test_raise1")
     )

@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
 
 from .content.containers import ContentContainer
-from .twitch.containers import BotContainer
+from .twitch.containers import TwitchContainer
 
 
 class FeaturesContainer(containers.DeclarativeContainer):
@@ -10,6 +10,6 @@ class FeaturesContainer(containers.DeclarativeContainer):
     content = providers.Container(
         ContentContainer, resources=resources, config=config.content
     )
-    bot = providers.Container(
-        BotContainer, resources=resources, config=config.bot
+    twitch = providers.Container(
+        TwitchContainer, resources=resources, config=config.bot
     )
