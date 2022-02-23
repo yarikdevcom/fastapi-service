@@ -1,0 +1,9 @@
+resources:
+  db:
+    url: "postgresql+asyncpg://app:app@localhost:5432/app"
+    echo: false
+    pool_size: 30
+    max_overflow: 10
+    pool_timeout: 10
+  redis:
+    url: "redis://localhost/1"

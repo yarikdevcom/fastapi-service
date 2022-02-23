@@ -12,7 +12,7 @@ from subprocess import call
 @click.argument("description")
 def makemigration(description):
     call(["docker-compose", "up", "-d"])
-    time.sleep(2)
+    time.sleep(5)
     try:
         call(
             [
@@ -55,7 +55,7 @@ def migrate(revision):
 @click.pass_context
 def server(ctx):
     call(["docker-compose", "up", "-d"])
-    time.sleep(2)
+    time.sleep(5)
     try:
         ctx.forward(migrate)
         call(["poetry", "run", "uvicorn", "app:APP", "--reload"])
@@ -67,7 +67,7 @@ def server(ctx):
 @click.pass_context
 def test(ctx):
     call(["docker-compose", "up", "-d"])
-    time.sleep(2)
+    time.sleep(5)
     try:
         ctx.forward(migrate)
         call(["poetry", "run", "pytest", "-s"])

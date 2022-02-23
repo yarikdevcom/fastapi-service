@@ -1,64 +1,17 @@
-import sqlalchemy as sa
-
 from dependency_injector import containers, providers
-from collections import deque
 
-from .resources import (
-    get_db_connection,
-    get_db_engine,
-    cleanup_db_connections,
-    get_celery,
-    get_redis,
-)
-from .models import Content, Bot
-from .tables import CONTENT_TABLE, BOT_TABLE
-from .services import ModelCursorService, ModelQueryService
-
-
-class DBContainer(containers.DeclarativeContainer):
-    config = providers.Configuration()
-    connections = providers.Singleton(deque)
-    metadata = providers.Singleton(sa.MetaData)
-    engine = providers.Resource(
-        get_db_engine,
-        url=config.url,
-        echo=config.echo,
-        pool_size=config.pool_size,
-        max_overflow=config.max_overflow,
-        pool_timeout=config.pool_timeout,
-        connections=connections,
-    )
-    cleanup = providers.Coroutine(cleanup_db_connections, connections)
-    connection = providers.Coroutine(get_db_connection, engine, connections)
-
-
-class ModelQueryContainer(containers.DeclarativeContainer):
-    db = providers.DependenciesContainer()
-    model = providers.Dependency()
-    table = providers.Dependency()
-    cursor = providers.Factory(ModelCursorService, db.connection, model)
-    query = providers.Factory(ModelQueryService, cursor, table)
+from .resources.containers import ResourcesContainer
+from .features import FeaturesContainer
 
 
 class AppContainer(containers.DeclarativeContainer):
-    config = providers.Configuration(
-        default={
-            "db": {
-                "url": "postgresql+asyncpg://ps:ps@localhost:5432/ps",
-                "echo": False,
-                "pool_size": 60,
-                "max_overflow": 0,
-                "pool_timeout": 30,
-            },
-            "redis": {"url": "redis://localhost/1"},
-        }
+    wiring_config = containers.WiringConfiguration(
+        packages=(".features.content", ".features.twitch")
     )
-    db = providers.Container(DBContainer, config=config.db)
-    celery = providers.Resource(get_celery)
-    redis = providers.Resource(get_redis, url=config.redis.url)
-    content = providers.Container(
-        ModelQueryContainer, db=db, model=Content, table=CONTENT_TABLE
+    config = providers.Configuration()
+    resources = providers.Container(
+        ResourcesContainer, config=config.resources
     )
-    bot = providers.Container(
-        ModelQueryContainer, db=db, model=Bot, table=BOT_TABLE
+    features = providers.Container(
+        FeaturesContainer, config=config.features, resources=resources
     )

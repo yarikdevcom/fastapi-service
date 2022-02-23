@@ -3,8 +3,11 @@ import asyncio
 import aioredis
 import sqlalchemy as sa
 
-from sqlalchemy.ext.asyncio import create_async_engine
 from celery import Celery
+from sqlalchemy.ext.asyncio import create_async_engine
+
+
+METADATA = sa.MetaData()
 
 
 def get_redis(url: str):
@@ -40,7 +43,7 @@ async def get_db_connection(engine, connections):
     return connection
 
 
-async def cleanup_db_connections(connections):
+async def cleanup_db_connection(connections):
     if not connections:
         return
     conn = connections.popleft()
@@ -70,6 +73,6 @@ async def get_db_engine(
     yield engine
 
     while connections:
-        await cleanup_db_connections(connections)
+        await cleanup_db_connection(connections)
 
     await engine.dispose()

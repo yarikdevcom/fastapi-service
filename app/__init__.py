@@ -3,11 +3,11 @@ import asyncio
 import asyncpg
 import sqlalchemy as sa
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, APIRouter
 from fastapi.responses import ORJSONResponse
+from dependency_injector import providers
 from celery.signals import task_prerun, task_postrun
 
-from . import api, tasks
 from .containers import AppContainer
 
 __version__ = "0.1.0"
@@ -15,15 +15,19 @@ __version__ = "0.1.0"
 
 APP = FastAPI(default_response_class=ORJSONResponse)
 
-# routes
-APP.include_router(api.router)
-
 # containers
 APP_CONTAINER = AppContainer()
-APP_CONTAINER.wire(modules=(api, tasks))
+APP_CONTAINER.config.from_yaml('./configs/test.yml')
+APP_CONTAINER.check_dependencies()
+
+# routes
+for obj in APP_CONTAINER.traverse(types=(providers.Object,)):
+    api = obj()
+    if isinstance(api, APIRouter):
+        APP.include_router(api)
 
 # celery app discovery
-CELERY = APP_CONTAINER.celery()
+CELERY = APP_CONTAINER.resources.celery()
 
 
 # events
@@ -35,13 +39,14 @@ async def on_startup():
 @APP.on_event("shutdown")
 async def on_shutdown():
     await APP_CONTAINER.shutdown_resources()
+    APP_CONTAINER.unwire()
 
 
 # middlewares
 @APP.middleware("http")
 async def cleanup_app_db_connections(request, call_next):
     response = await call_next(request)
-    await APP_CONTAINER.db.cleanup()
+    await APP_CONTAINER.resources.db.cleanup()
     return response
 
 

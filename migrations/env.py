@@ -6,9 +6,9 @@ from alembic import context
 from alembic.script import ScriptDirectory
 
 from app import APP_CONTAINER  # noqa: import to collect all dependencies
-from app.tables import METADATA
+from app.resources.providers import METADATA
 
-URL = str(APP_CONTAINER.config.db.url()).replace("asyncpg", "pg8000")
+URL = str(APP_CONTAINER.config.resources.db.url()).replace("asyncpg", "pg8000")
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

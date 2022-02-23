@@ -1,0 +1,52 @@
+name: Run tests
+
+on:
+  push: 
+    branches:
+      - 'main'
+      - 'production'
+      - 'feature/*'
+      - 'fix/*'
+  pull_request:
+    branches:
+      - 'main'
+      - 'production'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Set Up Python 3.10.2
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.2
+
+      - name: Download cache for pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: poetry-pip-1.1.13
+          restore-keys: poetry-pip
+
+      - name: Install poetry
+        run: 
+          pip install poetry==1.1.13
+
+      - name: Download cache for poetry
+        id: poetry-install
+        uses: actions/cache@v2
+        with:
+          path: ./.venv/
+          key: poetry-install-${{ hashFiles('poetry.lock') }}
+          restore-keys: poetry-install
+
+      - name: Install dependencies
+        if: steps.poetry-install.outputs.cache-hit != 'true'
+        run: rm -rf ./.venv/ && poetry install
+
+      - name: Run tests
+        run: poetry run test

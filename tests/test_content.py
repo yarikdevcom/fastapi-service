@@ -4,7 +4,7 @@ import asyncio
 
 @pytest.mark.asyncio
 async def test_content_created(client, container):
-    COUNT = 800
+    COUNT = 20
     URLS = [f"https://www.google.com/{i}" for i in range(COUNT)]
     responses = await asyncio.gather(
         *[client.post("/contents", json={"url": url}) for url in URLS]
@@ -21,7 +21,7 @@ async def test_content_created(client, container):
         *[client.post("/contents", json={"url": url}) for url in URLS]
     )
 
-    query = await container.content.query()
+    query = await container.features.content.data.query()
     assert len(URLS) == len(list(await query.all()))
 
     response = await client.get("/contents")

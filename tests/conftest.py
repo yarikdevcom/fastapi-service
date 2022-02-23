@@ -10,7 +10,7 @@ test_router = APIRouter()
 
 
 @test_router.get("/raise404")
-async def get_bot_many():
+async def raise_ex():
     raise ResourceClosedError
 
 
