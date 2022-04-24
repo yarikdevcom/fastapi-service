@@ -2,10 +2,8 @@ import asyncio
 
 import aioredis
 import sqlalchemy as sa
-
 from celery import Celery
 from sqlalchemy.ext.asyncio import create_async_engine
-
 
 METADATA = sa.MetaData()
 

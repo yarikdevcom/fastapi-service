@@ -2,11 +2,10 @@ import asyncio
 
 import asyncpg
 import sqlalchemy as sa
-
-from fastapi import FastAPI, Request, APIRouter
-from fastapi.responses import ORJSONResponse
+from celery.signals import task_postrun, task_prerun
 from dependency_injector import providers
-from celery.signals import task_prerun, task_postrun
+from fastapi import APIRouter, FastAPI, Request
+from fastapi.responses import ORJSONResponse
 
 from .containers import AppContainer
 

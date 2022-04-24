@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
 
-from .resources.containers import ResourcesContainer
 from .features import FeaturesContainer
+from .resources.containers import ResourcesContainer
 
 
 class AppContainer(containers.DeclarativeContainer):

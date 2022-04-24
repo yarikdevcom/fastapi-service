@@ -1,12 +1,12 @@
 from collections import deque
 
-from dependency_injector import providers, containers
+from dependency_injector import containers, providers
 
 from .providers import (
-    get_db_engine,
-    get_db_connection,
     cleanup_db_connection,
     get_celery,
+    get_db_connection,
+    get_db_engine,
     get_redis,
 )
 

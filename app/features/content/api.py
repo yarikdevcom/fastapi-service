@@ -1,13 +1,12 @@
+from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
-from dependency_injector.wiring import inject, Provide
 
-from ...resources.services import ModelQueryService
 from ...containers import AppContainer
-
+from ...resources.services import ModelQueryService
 from . import API
+from .containers import ContentContainer
 from .models import Content, ContentIn
 from .tasks import fetch_content
-from .containers import ContentContainer
 
 CONTAINER: ContentContainer = AppContainer.features.content  # type: ignore
 

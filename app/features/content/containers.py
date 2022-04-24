@@ -1,7 +1,6 @@
 from dependency_injector import containers, providers
 
 from ...resources.services import ModelQueryService
-
 from . import API
 from .models import Content
 from .tables import CONTENT_TABLE

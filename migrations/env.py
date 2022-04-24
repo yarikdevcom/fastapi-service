@@ -1,9 +1,8 @@
 from logging.config import fileConfig
 
-from sqlalchemy import pool, create_engine
-
 from alembic import context
 from alembic.script import ScriptDirectory
+from sqlalchemy import create_engine, pool
 
 from app import APP_CONTAINER  # noqa: import to collect all dependencies
 from app.resources.providers import METADATA

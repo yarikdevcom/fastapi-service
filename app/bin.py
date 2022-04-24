@@ -1,8 +1,8 @@
-import click
-import time
 import pathlib
-
+import time
 from subprocess import call
+
+import click
 
 # TODO: move all calls to docker into some contextmanager
 # or find proper lib to up and down containers

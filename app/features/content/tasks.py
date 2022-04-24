@@ -1,13 +1,12 @@
 import asyncio
 
 import httpx
-
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from dependency_injector.wiring import Provide, inject
 
-from ...resources.services import ModelQueryService
 from ...containers import AppContainer
+from ...resources.services import ModelQueryService
 
 logger = get_task_logger(__name__)
 
