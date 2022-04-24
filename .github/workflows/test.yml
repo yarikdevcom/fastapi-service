@@ -51,7 +51,7 @@ jobs:
       - name: Install dependencies
         if: steps.poetry-install.outputs.cache-hit != 'true'
         run: rm -rf ./.venv/ && poetry install
-      
+
       - name: Download cache pre-commit
         id: pre-commit-install
         uses: actions/cache@v2
