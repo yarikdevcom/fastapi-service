@@ -1,45 +1,38 @@
+---
 name: Run tests
-
-on:
+'on':
   push:
     branches:
-      - 'main'
-      - 'production'
-      - 'feature/*'
-      - 'fix/*'
+      - main
+      - production
+      - feature/*
+      - fix/*
   pull_request:
     branches:
-      - 'main'
-      - 'production'
-
+      - main
+      - production
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-
       - name: Get Python 3.10.3
         uses: actions/setup-python@v2
         with:
           python-version: 3.10.3
-
       - name: Get docker-compose
         run: |
           sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
-
       - name: Download cache for pip
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
           key: poetry-pip-1.1.13
           restore-keys: poetry-pip
-
       - name: Install poetry
         run: pip install poetry==1.1.13
-
       - name: Download cache for poetry
         id: poetry-install
         uses: actions/cache@v2
@@ -47,21 +40,17 @@ jobs:
           path: ./.venv/
           key: poetry-install-${{ hashFiles('poetry.lock') }}
           restore-keys: poetry-install
-
       - name: Install dependencies
         if: steps.poetry-install.outputs.cache-hit != 'true'
         run: rm -rf ./.venv/ && poetry install
-
       - name: Download cache pre-commit
         id: pre-commit-install
         uses: actions/cache@v2
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-install-${{ hashFiles('.pre-commit-config.yaml') }}
-          restory-keys: pre-commit-install
-
+          restore-keys: pre-commit-install
       - name: Verify pre-commit
         run: poetry run pre-commit run -a
-
       - name: Run tests
         run: poetry run test
