@@ -28,21 +28,17 @@ class ModelCursorService:
         return (self.model.validate(item) for item in result)
 
 
-class ModelDataService:
+class ModelQueryService:
     """Using model and linked table, provides general fetching methods:
     all, get, create, update, delete. Always accepting and returning model
     objects.
     """
 
-    def __init__(
-        self,
-        cursor: ModelCursorService,
-        table: sa.Table,
-    ):
-        self.cursor = cursor
+    def __init__(self, connection, table: sa.Table, model):
+        self.cursor = ModelCursorService(connection, model)
         self.table = table
-        self.commit = cursor.commit
-        self.rollback = cursor.rollback
+        self.commit = self.cursor.commit
+        self.rollback = self.cursor.rollback
 
     async def all(self):
         return await self.cursor.many(self.table.select())
@@ -67,7 +63,7 @@ class ModelDataService:
             query = query.limit(limit)
         if offset:
             query = query.offset(offset)
-        if order_by is None:
+        if order_by is not None:
             query = query.order_by(order_by)
         return (
             await self.cursor.one(query)

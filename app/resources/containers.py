@@ -9,7 +9,6 @@ from .providers import (
     get_celery,
     get_redis,
 )
-from .services import ModelCursorService, ModelDataService
 
 
 class DBContainer(containers.DeclarativeContainer):
@@ -26,14 +25,6 @@ class DBContainer(containers.DeclarativeContainer):
     )
     cleanup = providers.Coroutine(cleanup_db_connection, connections)
     connection = providers.Coroutine(get_db_connection, engine, connections)
-
-
-class ModelDataContainer(containers.DeclarativeContainer):
-    db = providers.DependenciesContainer()
-    model = providers.Dependency()
-    table = providers.Dependency()
-    cursor = providers.Factory(ModelCursorService, db.connection, model)
-    query = providers.Factory(ModelDataService, cursor, table)
 
 
 class ResourcesContainer(containers.DeclarativeContainer):

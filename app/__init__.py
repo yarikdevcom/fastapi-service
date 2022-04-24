@@ -17,7 +17,7 @@ APP = FastAPI(default_response_class=ORJSONResponse)
 
 # containers
 APP_CONTAINER = AppContainer()
-APP_CONTAINER.config.from_yaml('./configs/test.yml')
+APP_CONTAINER.config.from_yaml("./configs/test.yml")
 APP_CONTAINER.check_dependencies()
 
 # routes

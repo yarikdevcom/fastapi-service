@@ -1,8 +1,8 @@
 ## Bootstrap env
-- install `pyenv` first to able to use `pyenv install 3.10.1`
-- then use `pyenv use 3.10.2` and `pip install poetry`
+- install `pyenv` first to able to use `pyenv install 3.10.3`
+- then use `pyenv shell 3.10.3` and `pip install poetry`
 - `poetry install` to init your env
-- `poetry run pre-commit install` to autoformat your code
+- `poetry run pre-commit run -a` to autoformat your code
 
 ## Project commands [inside `app/bin.py`]
 - `poetry run test` -> runs docker compose containers and then runs tests
@@ -18,7 +18,7 @@
 ## Code styleguide
 - for first level module variables use `UPPER_CASE = 1` `API` etc.
 - all new features should be placed at `features` module
-- db tables always lower case `some_table_name`
+- db tables always lower case `some_table_name`, values upper case, for example `CONTENT_TABLE = 'content', not 'contents'
 
 ## Helpful urls
 - `REST` https://devhints.io/rest-api
@@ -44,3 +44,5 @@
     - `managers.py` - defines aggregated flows using `services,resources` into business logic
     - `containers.py` - defines construction of all dependencies (services, managers, tables, etc.)
     - `api.py` - defines endpoints with injected container dependencies
+
+- We need coverage report, mypylint
