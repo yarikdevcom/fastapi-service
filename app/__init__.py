@@ -18,15 +18,13 @@ APP = FastAPI(default_response_class=ORJSONResponse)
 APP_CONTAINER = AppContainer()
 APP_CONTAINER.config.from_yaml("./configs/test.yml")
 APP_CONTAINER.check_dependencies()
+APP_CONTAINER.resources.celery()
 
 # routes
 for obj in APP_CONTAINER.traverse(types=(providers.Object,)):
     api = obj()
     if isinstance(api, APIRouter):
         APP.include_router(api)
-
-# celery app discovery
-CELERY = APP_CONTAINER.resources.celery()
 
 
 # events

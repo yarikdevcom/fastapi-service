@@ -14,9 +14,7 @@ logger = get_task_logger(__name__)
 @inject
 async def fetch_content_async(
     content_id,
-    query: ModelQueryService = Provide[
-        AppContainer.features.content.content_query
-    ],
+    query: ModelQueryService = Provide[AppContainer.features.content.query],
 ):
     content = await query.get(content_id)
     content.body = httpx.get(content.url).text

@@ -31,7 +31,6 @@ def get_celery():
         result_serializer="msgpack",
         enable_utc=True,
     )
-    celery.autodiscover_tasks(["app"])
     yield celery
 
 

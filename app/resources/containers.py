@@ -29,6 +29,8 @@ class DBContainer(containers.DeclarativeContainer):
 
 class ResourcesContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
-    db = providers.Container(DBContainer, config=config.db)
+    db: DBContainer = providers.Container(
+        DBContainer, config=config.db
+    )  # type: ignore
     celery = providers.Resource(get_celery)
     redis = providers.Resource(get_redis, url=config.redis.url)

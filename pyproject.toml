@@ -30,6 +30,8 @@ mypy = "^0.931"
 sqlalchemy-stubs = "^0.4"
 black = "^21.12b0"
 httpx = "^0.21.3"
+celery-types = "^0.12.0"
+asyncpg-stubs = "^0.25.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

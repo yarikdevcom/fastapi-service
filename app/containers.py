@@ -9,9 +9,9 @@ class AppContainer(containers.DeclarativeContainer):
         packages=(".features.content",)
     )
     config = providers.Configuration()
-    resources = providers.Container(
+    resources: ResourcesContainer = providers.Container(
         ResourcesContainer, config=config.resources
-    )
-    features = providers.Container(
+    )  # type: ignore
+    features: FeaturesContainer = providers.Container(
         FeaturesContainer, config=config.features, resources=resources
-    )
+    )  # type: ignore

@@ -6,7 +6,7 @@ import click
 from alembic.command import revision, upgrade
 from alembic.config import Config
 
-ini_path = str(pathlib.Path(__file__).parent / "alembic.ini")
+ini_path = str(pathlib.Path(__file__).parent / "migrations" / "alembic.ini")
 config = Config(ini_path)
 
 # TODO: move all calls to docker into some contextmanager

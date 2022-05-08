@@ -12,3 +12,4 @@ cov.xml
 .vagrant
 /node_modules/
 /celery.db
+/.mypy_cache

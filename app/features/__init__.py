@@ -6,6 +6,6 @@ from .content.containers import ContentContainer
 class FeaturesContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
     resources = providers.DependenciesContainer()
-    content = providers.Container(
+    content: ContentContainer = providers.Container(
         ContentContainer, resources=resources, config=config.content
-    )
+    )  # type: ignore

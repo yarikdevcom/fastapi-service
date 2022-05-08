@@ -22,7 +22,7 @@ async def test_content_created(client, container):
         *[client.post("/contents", json={"url": url}) for url in URLS]
     )
 
-    query = await container.features.content.content_query()
+    query = await container.features.content.query()
     assert len(URLS) == len(list(await query.all()))
 
     response = await client.get("/contents")

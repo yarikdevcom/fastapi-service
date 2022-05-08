@@ -97,6 +97,18 @@ docs = ["Sphinx (>=4.1.2,<4.2.0)", "sphinxcontrib-asyncio (>=0.3.0,<0.4.0)", "sp
 test = ["pycodestyle (>=2.7.0,<2.8.0)", "flake8 (>=3.9.2,<3.10.0)", "uvloop (>=0.15.3)"]
 
 [[package]]
+name = "asyncpg-stubs"
+version = "0.25.1"
+description = "asyncpg stubs"
+category = "dev"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[package.dependencies]
+asyncpg = ">=0.25.0,<0.26.0"
+typing-extensions = ">=4.2.0,<5.0.0"
+
+[[package]]
 name = "atomicwrites"
 version = "1.4.0"
 description = "Atomic file writes."
@@ -204,6 +216,14 @@ tblib = ["tblib (>=1.3.0)", "tblib (>=1.5.0)"]
 yaml = ["PyYAML (>=3.10)"]
 zookeeper = ["kazoo (>=1.3.1)"]
 zstd = ["zstandard"]
+
+[[package]]
+name = "celery-types"
+version = "0.12.0"
+description = "Type stubs for Celery and its related packages"
+category = "dev"
+optional = false
+python-versions = ">=3.7,<4.0"
 
 [[package]]
 name = "certifi"
@@ -955,7 +975,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10.3"
-content-hash = "06cd08e1f2e8bfe7ec9f4ede1078c59b51d60eb7ad4d7f6f48886ce802b14dfb"
+content-hash = "fe8d3773616fc1e2185b3117a5b640889c1022a8dd03e45b334aa99c028a6729"
 
 [metadata.files]
 aioredis = [
@@ -1014,6 +1034,10 @@ asyncpg = [
     {file = "asyncpg-0.25.0-cp39-cp39-win_amd64.whl", hash = "sha256:649e2966d98cc48d0646d9a4e29abecd8b59d38d55c256d5c857f6b27b7407ac"},
     {file = "asyncpg-0.25.0.tar.gz", hash = "sha256:63f8e6a69733b285497c2855464a34de657f2cccd25aeaeeb5071872e9382540"},
 ]
+asyncpg-stubs = [
+    {file = "asyncpg-stubs-0.25.1.tar.gz", hash = "sha256:ee4758e287751a37a455ac0132d52fdb9f06d3a35137b3590e7797e899a5f361"},
+    {file = "asyncpg_stubs-0.25.1-py3-none-any.whl", hash = "sha256:30066ca0e15c38334b1961a389248033d4491f4a5360f03abd49defa9d8445e5"},
+]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},
     {file = "atomicwrites-1.4.0.tar.gz", hash = "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a"},
@@ -1033,6 +1057,10 @@ black = [
 celery = [
     {file = "celery-5.2.6-py3-none-any.whl", hash = "sha256:da31f8eae7607b1582e5ee2d3f2d6f58450585afd23379491e3d9229d08102d0"},
     {file = "celery-5.2.6.tar.gz", hash = "sha256:d1398cadf30f576266b34370e28e880306ec55f7a4b6307549b0ae9c15663481"},
+]
+celery-types = [
+    {file = "celery-types-0.12.0.tar.gz", hash = "sha256:22a0b46d04508bbdb5074d070ebac6179550c2aa8506e1b05b74850d61d4fa82"},
+    {file = "celery_types-0.12.0-py3-none-any.whl", hash = "sha256:4648eeeafa10eabaf4e414e4a9546d8a5cfec0f025a325a4c42508d16273be5c"},
 ]
 certifi = [
     {file = "certifi-2021.10.8-py2.py3-none-any.whl", hash = "sha256:d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569"},

@@ -14,7 +14,7 @@ CONTAINER: ContentContainer = AppContainer.features.content  # type: ignore
 @API.get("/contents", response_model=list[Content])
 @inject
 async def get_content_many(
-    query=Depends(Provide[CONTAINER.content_query]),
+    query=Depends(Provide[CONTAINER.query]),
 ):
     return await query.all()
 
@@ -23,7 +23,7 @@ async def get_content_many(
 @inject
 async def create_content(
     content_in: ContentIn,
-    query: ModelQueryService = Depends(Provide[CONTAINER.content_query]),
+    query: ModelQueryService = Depends(Provide[CONTAINER.query]),
 ):
     content: Content = await query.create(content_in)
     await query.commit()
