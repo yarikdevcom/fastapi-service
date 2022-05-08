@@ -3,6 +3,11 @@ import time
 from subprocess import call
 
 import click
+from alembic.command import revision, upgrade
+from alembic.config import Config
+
+ini_path = str(pathlib.Path(__file__).parent / "alembic.ini")
+config = Config(ini_path)
 
 # TODO: move all calls to docker into some contextmanager
 # or find proper lib to up and down containers
@@ -14,17 +19,7 @@ def makemigration(description):
     call(["docker-compose", "up", "-d"])
     time.sleep(5)
     try:
-        call(
-            [
-                "poetry",
-                "run",
-                "alembic",
-                "revision",
-                "--autogenerate",
-                "-m",
-                str(description),
-            ]
-        )
+        revision(config, description, True)
         call(["poetry", "run", "pre-commit", "run", "-a"])
     finally:
         call(["docker-compose", "down"])
@@ -33,13 +28,15 @@ def makemigration(description):
 @click.command()
 @click.pass_context
 def recreatemigrations(ctx):
-    py_files = list(pathlib.Path("migrations/versions").glob("*.py"))
+    py_files = list(
+        (pathlib.Path(__file__).parent / "migrations/versions").glob("*.py")
+    )
     if len(py_files) > 1:
         click.echo(
             "You can't recreate initial migration because "
             "you have forward migrations"
         )
-    for py_file in pathlib.Path("migrations/versions").glob("*.py"):
+    for py_file in py_files:
         py_file.unlink()
     ctx.forward(makemigration, description="Initial migration")
 
@@ -48,7 +45,7 @@ def recreatemigrations(ctx):
 @click.argument("revision", required=False)
 def migrate(revision):
     revision = revision or "heads"
-    call(["poetry", "run", "alembic", "upgrade", str(revision)])
+    upgrade(config, revision)
 
 
 @click.command()
