@@ -1,12 +1,13 @@
 import pytest_asyncio
 from httpx import AsyncClient
 
-from app import APP, APP_CONTAINER
+from app import APP_CONTAINER
+from app.api import API
 
 
 @pytest_asyncio.fixture
 async def client():
-    async with AsyncClient(app=APP, base_url="http://test.com") as cl:
+    async with AsyncClient(app=API, base_url="http://test.com") as cl:
         yield cl
 
 

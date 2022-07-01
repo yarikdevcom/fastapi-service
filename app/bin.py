@@ -17,7 +17,7 @@ config = Config(ini_path)
 @click.argument("description")
 def makemigration(description):
     call(["docker-compose", "up", "-d"])
-    time.sleep(5)
+    time.sleep(2)
     try:
         revision(config, description, True)
         call(["poetry", "run", "pre-commit", "run", "-a"])
@@ -52,7 +52,7 @@ def migrate(revision):
 @click.pass_context
 def server(ctx):
     call(["docker-compose", "up", "-d"])
-    time.sleep(5)
+    time.sleep(2)
     try:
         ctx.forward(migrate)
         call(["poetry", "run", "uvicorn", "app:APP", "--reload"])
@@ -64,7 +64,7 @@ def server(ctx):
 @click.pass_context
 def test(ctx):
     call(["docker-compose", "up", "-d"])
-    time.sleep(5)
+    time.sleep(2)
     try:
         ctx.forward(migrate)
         call(["poetry", "run", "pytest", "-s"])

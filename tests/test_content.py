@@ -5,7 +5,7 @@ import pytest
 
 @pytest.mark.asyncio
 async def test_content_created(client, container):
-    COUNT = 20
+    COUNT = 40
     URLS = [f"https://www.google.com/{i}" for i in range(COUNT)]
     responses = await asyncio.gather(
         *[client.post("/contents", json={"url": url}) for url in URLS]
