@@ -4,7 +4,7 @@ from celery.signals import worker_init, worker_shutdown
 
 from . import APP_CONTAINER
 
-APP_CONTAINER.resources.celery()
+CELERY = APP_CONTAINER.resources.celery()
 
 
 @worker_init.connect

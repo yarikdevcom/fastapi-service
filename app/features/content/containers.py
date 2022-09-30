@@ -1,19 +1,15 @@
 from dependency_injector import containers, providers
 
 from ...resources.containers import ResourcesContainer
-from ...resources.services import ModelQueryService
-from . import API
-from .models import Content
-from .tables import CONTENT_TABLE
+
+# from .services import ContentCRUD
+# from .tables import CONTENT_TABLE
 
 
-class ContentContainer(containers.DeclarativeContainer):
+class ContentContainer(containers.DynamicContainer):
     config = providers.Configuration()
-    api = providers.Object(API)
     resources: ResourcesContainer = providers.DependenciesContainer(
         db=providers.DependenciesContainer()
     )  # type: ignore
 
-    query = providers.Factory(
-        ModelQueryService, resources.db.connection, CONTENT_TABLE, Content
-    )
+    # crud = providers.Factory(ContentCRUD, CONTENT_TABLE, resources.db.engine)

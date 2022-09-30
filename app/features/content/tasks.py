@@ -6,7 +6,8 @@ from celery.utils.log import get_task_logger
 from dependency_injector.wiring import Provide, inject
 
 from ...containers import AppContainer
-from ...resources.services import ModelQueryService
+from ...resources.providers import ConnectionProvider
+from .tables import CONTENT_TABLE
 
 logger = get_task_logger(__name__)
 
@@ -14,13 +15,19 @@ logger = get_task_logger(__name__)
 @inject
 async def fetch_content_async(
     content_id,
-    query: ModelQueryService = Provide[AppContainer.features.content.query],
+    cursor: ConnectionProvider = Provide[AppContainer.resources.db],
 ):
-    content = await query.get(content_id)
-    content.body = httpx.get(content.url).text
-    await query.update(content)
-    await query.commit()
-    logger.info([content.id, len(content.body)])
+    content = await cursor.one(
+        CONTENT_TABLE.select(CONTENT_TABLE.c.id == content_id)
+    )
+    async with httpx.AsyncClient() as cl:
+        body = (await cl.get(content["url"])).text
+    await cursor.execute(
+        CONTENT_TABLE.update(CONTENT_TABLE.c.id == content_id).values(
+            {"body": body}
+        ),
+        commit=True,
+    )
 
 
 @shared_task(autoretry_for=(Exception,), name="fetch_content")

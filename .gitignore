@@ -1,7 +1,6 @@
 __pycache__/
 cov.xml
 .coverage
-/venv/
 /.venv/
 .DS_Store
 *.egg-info

@@ -1,0 +1,26 @@
+---
+resources:
+  db:
+    url: ${DB_URL:"postgresql+asyncpg://app:app@localhost:5432/app"}
+    echo: ${DB_ECHO:false}
+    pool_size: ${DB_POOL_SIZE:30}
+    max_overflow: ${DB_MAX_OVERFLOW:10}
+    pool_timeout: ${DB_POOL_TIMEOUT:10}
+  redis:
+    url: ${REDIS_URL:"redis://localhost/1"}
+
+api:
+  cors:
+    allow_origins:
+      - 'http://localhost:9000'
+    allow_credentials: true
+    allow_methods:
+      - '*'
+    allow_headers:
+      - '*'
+    expose_headers:
+      - 'x-total-count'
+      - 'x-has-more'
+features:
+  some_feature:
+    key: ${SOME_FEATURE_KEY:"please_change_me"}

@@ -1,18 +1,28 @@
+import importlib
+
 import asyncpg
 import sqlalchemy as sa
-from dependency_injector import providers
-from fastapi import APIRouter, FastAPI, Request
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
 from . import APP_CONTAINER
 
 API = FastAPI(default_response_class=ORJSONResponse)
 
-# routes
-for obj in APP_CONTAINER.traverse(types=(providers.Object,)):
-    api = obj()
-    if isinstance(api, APIRouter):
-        API.include_router(api)
+for package in APP_CONTAINER.wiring_config.packages:
+    api_module = importlib.import_module(f"{package}.api", package=__package__)
+    API.include_router(api_module.API)
+
+
+API.add_middleware(
+    CORSMiddleware,
+    allow_origins=APP_CONTAINER.config.api.cors.allow_origins(),
+    allow_credentials=APP_CONTAINER.config.api.cors.allow_credentials(),
+    allow_methods=APP_CONTAINER.config.api.cors.allow_methods(),
+    allow_headers=APP_CONTAINER.config.api.cors.allow_headers(),
+    expose_headers=APP_CONTAINER.config.api.cors.expose_headers(),
+)
 
 
 # events
@@ -27,17 +37,8 @@ async def on_shutdown():
     APP_CONTAINER.unwire()
 
 
-# middlewares
-@API.middleware("http")
-async def cleanup_API_db_connections(request, call_next):
-    response = await call_next(request)
-    await APP_CONTAINER.resources.db.cleanup()
-    return response
-
-
 # exceptions
 @API.exception_handler(sa.exc.TimeoutError)
-@API.exception_handler(sa.exc.ResourceClosedError)
 @API.exception_handler(asyncpg.exceptions.TooManyConnectionsError)
 async def sa_timeout_error_exception_handler(
     request: Request, exc: sa.exc.TimeoutError
@@ -48,17 +49,8 @@ async def sa_timeout_error_exception_handler(
     )
 
 
-@API.exception_handler(sa.exc.IntegrityError)
-@API.exception_handler(sa.exc.InterfaceError)
-@API.exception_handler(sa.exc.DBAPIError)
+@API.exception_handler(asyncpg.exceptions.UniqueViolationError)
 async def sa_integrity_error_exception_handler(
     request: Request, exc: sa.exc.IntegrityError
 ):
-    orig = str(exc.orig)
-    if "asyncpg.exceptions.UniqueViolationError" in orig:
-        message = f"Database unique value violation: {orig.split('>: ')[1]}"
-        return ORJSONResponse(status_code=409, content={"message": message})
-
-    return ORJSONResponse(
-        status_code=500, content={"message": f"Database error: {exc}"}
-    )
+    return ORJSONResponse(status_code=409, content={"message": str(exc)})

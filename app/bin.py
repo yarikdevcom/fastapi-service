@@ -16,13 +16,13 @@ config = Config(ini_path)
 @click.command()
 @click.argument("description")
 def makemigration(description):
-    call(["docker-compose", "up", "-d"])
+    call(["docker", "compose", "up", "-d"])
     time.sleep(2)
     try:
         revision(config, description, True)
         call(["poetry", "run", "pre-commit", "run", "-a"])
     finally:
-        call(["docker-compose", "down"])
+        call(["docker", "compose", "down"])
 
 
 @click.command()
@@ -51,25 +51,32 @@ def migrate(revision):
 @click.command()
 @click.pass_context
 def server(ctx):
-    call(["docker-compose", "up", "-d"])
+    call(["docker", "compose", "up", "-d"])
     time.sleep(2)
     try:
         ctx.forward(migrate)
-        call(["poetry", "run", "uvicorn", "app:APP", "--reload"])
+        ctx.forward(uvicorn)
     finally:
-        call(["docker-compose", "down"])
+        call(["docker", "compose", "down"])
+
+
+@click.command()
+@click.pass_context
+def uvicorn(ctx):
+    ctx.forward(migrate)
+    call(["poetry", "run", "uvicorn", "app.api:API", "--reload"])
 
 
 @click.command()
 @click.pass_context
 def test(ctx):
-    call(["docker-compose", "up", "-d"])
+    call(["docker", "compose", "up", "-d"])
     time.sleep(2)
     try:
         ctx.forward(migrate)
         call(["poetry", "run", "pytest", "-s"])
     finally:
-        call(["docker-compose", "down"])
+        call(["docker", "compose", "down"])
 
 
 @click.command()
@@ -80,7 +87,7 @@ def worker():
             "run",
             "celery",
             "-A",
-            "app",
+            "app.worker.CELERY",
             "worker",
             "--loglevel=INFO",
             "--pool=solo",

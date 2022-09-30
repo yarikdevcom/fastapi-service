@@ -1,12 +1,8 @@
 {
-    "python.linting.enabled": true,
     "python.defaultInterpreterPath": "./.venv/bin/python",
+    "python.linting.enabled": true,
     "python.linting.flake8Enabled": true,
-    "python.analysis.autoImportCompletions": false,
     "mypy.runUsingActiveInterpreter": true,
-    "editor.rulers": [79],
-    "editor.wordWrap": "wordWrapColumn",
-    "editor.wordWrapColumn": 79,
     "files.exclude": {
         "**/.git": true,
         "**/.DS_Store": true,
