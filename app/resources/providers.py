@@ -1,11 +1,10 @@
-from contextlib import asynccontextmanager
+import typing as TP
+from contextlib import asynccontextmanager, contextmanager
 
 import aioredis
-import asyncpg
 import sqlalchemy as sa
 from celery import Celery
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.pool import NullPool
+from sqlalchemy.ext.asyncio import AsyncConnection, create_async_engine
 
 METADATA = sa.MetaData()
 
@@ -36,17 +35,6 @@ def get_celery():
     yield celery
 
 
-async def get_db_pool(
-    url: str,
-    min_size: int,
-    max_size: int,
-):
-    url = url.replace("+asyncpg", "")
-    pool = await asyncpg.create_pool(url, min_size=min_size, max_size=max_size)
-    yield pool
-    await pool.close()
-
-
 async def get_db_engine(
     url: str,
     echo: bool,
@@ -57,10 +45,9 @@ async def get_db_engine(
     engine = create_async_engine(
         f"{url}?prepared_statement_cache_size=100",
         echo=echo,
-        # pool_size=pool_size,
-        # max_overflow=max_overflow,
-        # pool_timeout=pool_timeout,
-        poolclass=NullPool,
+        pool_size=pool_size,
+        max_overflow=max_overflow,
+        pool_timeout=pool_timeout,
         connect_args={"server_settings": {"jit": "off"}},
     )
     yield engine
@@ -68,44 +55,70 @@ async def get_db_engine(
 
 
 class ConnectionProvider:
-    def __init__(self, pool: asyncpg.Pool):
-        self.raw = None
-        self.pool = pool
+    """
+    async def somelogic(cn, dal1, dal2):
+        await dal1.blah()
 
-    def prepare(self, query):
-        compiled = query.compile()
-        query = str(compiled)
-        for index, key in enumerate(compiled.params, 1):
-            query = query.replace(f":{key}", f"${index}")
-        # print('query', query)
-        return query, compiled.params.values()
+        async with cn.transaction(), dal1.inject(cn), dal2.inject(cn):
+            await dal1.some_logic()
+            await dal2.some_logci()
+    """
 
-    # def use(self, connection=None):
-    #     if self.raw:
-    #         pass
-    #     old_connection = self.raw
-    #     self.raw = connection.raw
-    #     yield
-    #     self.raw = old_connection
+    def __init__(self, engine):
+        self.engine = engine
+        self.current = False
+        self.injected = None
 
     @asynccontextmanager
-    async def acquire(self):
-        if not self.raw:
-            async with self.pool.acquire() as raw:
-                yield raw
-        else:
-            yield self.raw
+    async def inject(
+        self, connection: "ConnectionProvider"
+    ) -> TP.AsyncGenerator["ConnectionProvider", None]:
+        if self.current:
+            raise ValueError(
+                "Connection already used, you cannot override current one"
+            )
+        if self.injected:
+            raise ValueError("Already injected connection exists")
 
-    async def scalar(self, query, commit: bool = False):
-        return (await self.prepare(query, commit)).scalar()
+        self.injected = connection.current
+        yield self
+        self.injected = None
+
+    @asynccontextmanager
+    async def acquire(
+        self, tx=True
+    ) -> TP.AsyncGenerator[AsyncConnection, None]:
+        if self.current and not self.injected:
+            raise ValueError(
+                "Connection already used, you cannot override current one"
+            )
+
+        if self.injected:
+            yield self.injected
+        else:
+            manager = self.engine.begin if tx else self.engine.connect
+            async with manager() as cn:
+                self.current = cn
+                yield cn
+                self.current = None
+
+    async def scalar(self, query, commit: bool = False) -> TP.Any | None:
+        async with self.acquire() as cn:
+            result = (await cn.execute(query)).scalar()
+            if commit:
+                await cn.commit()
+            return result
 
     async def one(self, query, commit: bool = False) -> dict | None:
-        query, params = self.prepare(query)
-        async with self.acquire() as raw:
-            row = await raw.fetchrow(query, *params)
+        async with self.acquire() as cn:
+            row = (await cn.execute(query)).fetchone()
+            if commit:
+                await cn.commit()
         return dict(row) if row else None
 
     async def many(self, query, commit: bool = False) -> list[dict]:
-        query, params = self.prepare(query)
-        async with self.acquire() as raw:
-            return [dict(row) for row in (await raw.fetch(query, *params))]
+        async with self.acquire() as cn:
+            rows = (await cn.execute(query)).fetchall()
+            if commit:
+                await cn.commit()
+            return [dict(row) for row in rows]

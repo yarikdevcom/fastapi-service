@@ -1,12 +1,6 @@
 from dependency_injector import containers, providers
 
-from .providers import (
-    ConnectionProvider,
-    get_celery,
-    get_db_engine,
-    get_db_pool,
-    get_redis,
-)
+from .providers import ConnectionProvider, get_celery, get_db_engine, get_redis
 
 
 class DBContainer(containers.DeclarativeContainer):
@@ -19,13 +13,7 @@ class DBContainer(containers.DeclarativeContainer):
         max_overflow=config.max_overflow.as_int(),
         pool_timeout=config.pool_timeout.as_int(),
     )
-    pool = providers.Resource(
-        get_db_pool,
-        url=config.url,
-        min_size=config.pool_size.as_int(),
-        max_size=config.pool_size.as_int(),
-    )
-    connection = providers.Factory(ConnectionProvider, pool)
+    connection = providers.Factory(ConnectionProvider, engine)
 
 
 class ResourcesContainer(containers.DeclarativeContainer):

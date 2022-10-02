@@ -50,6 +50,7 @@ async def sa_timeout_error_exception_handler(
 
 
 @API.exception_handler(asyncpg.exceptions.UniqueViolationError)
+@API.exception_handler(sa.exc.IntegrityError)
 async def sa_integrity_error_exception_handler(
     request: Request, exc: sa.exc.IntegrityError
 ):

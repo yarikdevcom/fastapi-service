@@ -3,9 +3,9 @@ resources:
   db:
     url: ${DB_URL:"postgresql+asyncpg://app:app@localhost:5432/app"}
     echo: ${DB_ECHO:false}
-    pool_size: ${DB_POOL_SIZE:30}
-    max_overflow: ${DB_MAX_OVERFLOW:10}
-    pool_timeout: ${DB_POOL_TIMEOUT:10}
+    pool_size: ${DB_POOL_SIZE:5}
+    max_overflow: ${DB_MAX_OVERFLOW:5}
+    pool_timeout: ${DB_POOL_TIMEOUT:60}
   redis:
     url: ${REDIS_URL:"redis://localhost/1"}
 

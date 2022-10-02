@@ -24,7 +24,15 @@ async def get_content_many(
 async def create_content(
     content_in: ContentIn,
     connection: ConnectionProvider = Depends(Provide[CONNECTION]),
+    c1: ConnectionProvider = Depends(Provide[CONNECTION]),
+    c2: ConnectionProvider = Depends(Provide[CONNECTION]),
 ):
+    # test example of injecting connections
+    async with connection.acquire() as cn, c1.inject(connection), c2.inject(
+        connection
+    ):
+        assert c1.injected == connection.current == cn
+        assert c2.injected == connection.current == cn
     content = await connection.one(
         CONTENT_TABLE.insert(content_in.dict()).returning(CONTENT_TABLE),
         commit=True,
