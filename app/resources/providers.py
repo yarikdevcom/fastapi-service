@@ -1,5 +1,5 @@
 import typing as TP
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import asynccontextmanager
 
 import aioredis
 import sqlalchemy as sa
@@ -109,14 +109,18 @@ class ConnectionProvider:
                 await cn.commit()
             return result
 
-    async def one(self, query, commit: bool = False) -> dict | None:
+    async def one(
+        self, query, commit: bool = False
+    ) -> dict[str, TP.Any] | None:
         async with self.acquire() as cn:
             row = (await cn.execute(query)).fetchone()
             if commit:
                 await cn.commit()
         return dict(row) if row else None
 
-    async def many(self, query, commit: bool = False) -> list[dict]:
+    async def many(
+        self, query, commit: bool = False
+    ) -> list[dict[str, TP.Any]]:
         async with self.acquire() as cn:
             rows = (await cn.execute(query)).fetchall()
             if commit:

@@ -37,5 +37,6 @@ async def create_content(
         CONTENT_TABLE.insert(content_in.dict()).returning(CONTENT_TABLE),
         commit=True,
     )
-    fetch_content.apply_async((content["id"],))
+    if content:
+        fetch_content.apply_async((content["id"],))
     return content
