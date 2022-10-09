@@ -5,7 +5,7 @@ from ...containers import AppContainer
 from ...resources.providers import ConnectionProvider
 from .models import Content, ContentIn
 from .tables import CONTENT_TABLE
-from .tasks import fetch_content
+# from .tasks import fetch_content_async
 
 CONNECTION = AppContainer.resources.db.connection  # type: ignore
 API = APIRouter()
@@ -31,12 +31,12 @@ async def create_content(
     async with connection.acquire() as cn, c1.inject(connection), c2.inject(
         connection
     ):
-        assert c1.injected == connection.current == cn
-        assert c2.injected == connection.current == cn
-    content = await connection.one(
-        CONTENT_TABLE.insert(content_in.dict()).returning(CONTENT_TABLE),
-        commit=True,
-    )
-    if content:
-        fetch_content.apply_async((content["id"],))
+        assert c1.current == connection.current == cn
+        assert c2.current == connection.current == cn
+        content = await connection.one(
+            CONTENT_TABLE.insert(content_in.dict()).returning(CONTENT_TABLE),
+            # commit=True,
+        )
+        # if content:
+        # await fetch_content_async(content["id"], connection=connection)
     return content

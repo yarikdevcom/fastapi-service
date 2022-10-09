@@ -15,19 +15,21 @@ logger = get_task_logger(__name__)
 @inject
 async def fetch_content_async(
     content_id,
-    cursor: ConnectionProvider = Provide[AppContainer.resources.db],
+    connection: ConnectionProvider = Provide[
+        AppContainer.resources.db.connection
+    ],
 ):
-    content = await cursor.one(
-        CONTENT_TABLE.select(CONTENT_TABLE.c.id == content_id)
-    )
-    async with httpx.AsyncClient() as cl:
-        body = (await cl.get(content["url"])).text
-    await cursor.execute(
-        CONTENT_TABLE.update(CONTENT_TABLE.c.id == content_id).values(
-            {"body": body}
-        ),
-        commit=True,
-    )
+    async with connection.acquire():
+        content = await connection.one(
+            CONTENT_TABLE.select(CONTENT_TABLE.c.id == content_id)
+        )
+        async with httpx.AsyncClient() as cl:
+            body = (await cl.get(content["url"])).text
+        await connection.execute(
+            CONTENT_TABLE.update(CONTENT_TABLE.c.id == content_id).values(
+                {"body": body}
+            ),
+        )
 
 
 @shared_task(autoretry_for=(Exception,), name="fetch_content")

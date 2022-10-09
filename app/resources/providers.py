@@ -66,8 +66,7 @@ class ConnectionProvider:
 
     def __init__(self, engine):
         self.engine = engine
-        self.current = False
-        self.injected = None
+        self.current: AsyncConnection | None = None
 
     @asynccontextmanager
     async def inject(
@@ -77,52 +76,36 @@ class ConnectionProvider:
             raise ValueError(
                 "Connection already used, you cannot override current one"
             )
-        if self.injected:
-            raise ValueError("Already injected connection exists")
 
-        self.injected = connection.current
+        self.current = connection.current
         yield self
-        self.injected = None
+        self.current = None
 
     @asynccontextmanager
-    async def acquire(
-        self, tx=True
-    ) -> TP.AsyncGenerator[AsyncConnection, None]:
-        if self.current and not self.injected:
-            raise ValueError(
-                "Connection already used, you cannot override current one"
-            )
-
-        if self.injected:
-            yield self.injected
+    async def acquire(self) -> TP.AsyncGenerator[AsyncConnection, None]:
+        if self.current:
+            yield self.current
         else:
-            manager = self.engine.begin if tx else self.engine.connect
-            async with manager() as cn:
+            async with self.engine.begin() as cn:
                 self.current = cn
                 yield cn
                 self.current = None
 
-    async def scalar(self, query, commit: bool = False) -> TP.Any | None:
+    async def execute(self, query) -> None:
+        async with self.acquire() as cn:
+            await cn.execute(query)
+
+    async def scalar(self, query) -> TP.Any | None:
         async with self.acquire() as cn:
             result = (await cn.execute(query)).scalar()
-            if commit:
-                await cn.commit()
-            return result
+        return result
 
-    async def one(
-        self, query, commit: bool = False
-    ) -> dict[str, TP.Any] | None:
+    async def one(self, query) -> dict[str, TP.Any]:
         async with self.acquire() as cn:
             row = (await cn.execute(query)).fetchone()
-            if commit:
-                await cn.commit()
-        return dict(row) if row else None
+        return dict(row) if row else dict()
 
-    async def many(
-        self, query, commit: bool = False
-    ) -> list[dict[str, TP.Any]]:
+    async def many(self, query) -> list[dict[str, TP.Any]]:
         async with self.acquire() as cn:
             rows = (await cn.execute(query)).fetchall()
-            if commit:
-                await cn.commit()
-            return [dict(row) for row in rows]
+        return [dict(row) for row in rows]

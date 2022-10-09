@@ -7,7 +7,7 @@ from app.features.content.tables import CONTENT_TABLE
 
 @pytest.mark.asyncio
 async def test_content_created(client, cursor):
-    COUNT = 1000
+    COUNT = 100
 
     URLS = [f"https://www.google.com/{i}" for i in range(COUNT)]
     responses = await asyncio.gather(
@@ -28,3 +28,6 @@ async def test_content_created(client, cursor):
         assert resp.status_code == 409, resp.json()
 
     assert len(URLS) == len(list(await cursor.many(CONTENT_TABLE.select())))
+
+    contents = await client.get("/contents")
+    assert len(URLS) == len(contents.json())
