@@ -5,6 +5,7 @@ from ...containers import AppContainer
 from ...resources.providers import ConnectionProvider
 from .models import Content, ContentIn
 from .tables import CONTENT_TABLE
+
 # from .tasks import fetch_content_async
 
 CONNECTION = AppContainer.resources.db.connection  # type: ignore
