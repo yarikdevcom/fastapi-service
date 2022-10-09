@@ -36,7 +36,7 @@ jobs:
         id: poetry-install
         uses: actions/cache@v2
         with:
-          path: ~/.venv
+          path: ./.venv
           key: poetry-install-${{ hashFiles('poetry.lock') }}
           restore-keys: poetry-install
 
