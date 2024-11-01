@@ -1,3 +1,5 @@
+## OUTDATED: do not use
+
 ## Bootstrap env
 - install `pyenv` first to able to use `pyenv install 3.10.3`
 - then use `pyenv shell 3.10.3` and `pip install poetry`
